@@ -1,0 +1,7 @@
+# ninja log v6
+9	1364	8172505845745020	CMakeFiles/labGraphs.dir/src/Tests.cpp.obj	4be9fc04379532c7
+3	2098	8172505845689079	CMakeFiles/labGraphs.dir/src/main.cpp.obj	143d97f9ddfc3e1f
+2100	2314	8172505866647125	labGraphs.exe	91b6d2ddcd6b872b
+23	1207	8172523051274822	CMakeFiles/labGraphs.dir/src/Tests.cpp.obj	4be9fc04379532c7
+17	2084	8172523051214793	CMakeFiles/labGraphs.dir/src/main.cpp.obj	143d97f9ddfc3e1f
+2084	2243	8172523071886286	labGraphs.exe	91b6d2ddcd6b872b
