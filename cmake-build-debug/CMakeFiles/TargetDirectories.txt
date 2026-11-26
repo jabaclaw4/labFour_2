@@ -1,3 +1,5 @@
-C:/Users/User/CLionProjects/labFour_2/cmake-build-debug/CMakeFiles/labGraphs.dir
-C:/Users/User/CLionProjects/labFour_2/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/User/CLionProjects/labFour_2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/jabaclaw4/CLionProjects/labFour_2/cmake-build-debug/CMakeFiles/graph_tests.dir
+C:/Users/jabaclaw4/CLionProjects/labFour_2/cmake-build-debug/CMakeFiles/GraphLab.dir
+C:/Users/jabaclaw4/CLionProjects/labFour_2/cmake-build-debug/CMakeFiles/GraphTests.dir
+C:/Users/jabaclaw4/CLionProjects/labFour_2/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/jabaclaw4/CLionProjects/labFour_2/cmake-build-debug/CMakeFiles/rebuild_cache.dir

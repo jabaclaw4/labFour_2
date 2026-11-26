@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "GraphLab",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "GraphLab::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GraphLab-Debug-8e4c050b9d413fca250d.json",
+					"name" : "GraphLab",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "GraphTests::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GraphTests-Debug-49f8b55ef0a16ec7deb7.json",
+					"name" : "GraphTests",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "graph_tests::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-graph_tests-Debug-d9c1c5b1a2c6b16d5e5a.json",
+					"name" : "graph_tests",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/jabaclaw4/CLionProjects/labFour_2/cmake-build-debug",
+		"source" : "C:/Users/jabaclaw4/CLionProjects/labFour_2"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
