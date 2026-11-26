@@ -16,7 +16,7 @@ public:
 };
 
 template <EdgeWeight W>
-using EdgePtr = std::shared_ptr<const IEdge<W>>;
+using EdgePtr = std::shared_ptr<const IEdge<W>>;// храним с списках смежности указатели на ребра
 
 template <EdgeWeight W>
-using EdgeList = DynamicArray<EdgePtr<W>>;
+using EdgeList = DynamicArray<EdgePtr<W>>;// список ребер для одной вершины

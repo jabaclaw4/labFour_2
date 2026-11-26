@@ -1,9 +1,20 @@
 #pragma once
 
-#include "../core/Common.h"
-#include "../core/DynamicArray.h"
-#include "../core/ResultInfo.h"
-#include "../graph/IGraph.h"
+#include <utility>
+#include "core/Common.h"
+#include "core/DynamicArray.h"
+#include "core/ResultInfo.h"
+#include "graph/IGraph.h"
+
+// типы входов и результатов алгоритмов, самих алгоритмов здесь нет
+
+// вход алгоритма, которому нужна стартовая вершина
+struct StartVertex {
+    int vertex;
+};
+
+// вход алгоритма, которому ничего кроме графа не нужно
+struct NoInput {};
 
 // результат поиска компонент сильной связности
 struct SccResult {
@@ -43,14 +54,4 @@ struct ShortestPathResult {
         }
         return R::Success(std::move(path));
     }
-};
-
-// общий интерфейс алгоритмов на графах, конкретные алгоритмы это его реализации
-template <EdgeWeight W>
-class IGraphAlgorithms {
-public:
-    virtual ~IGraphAlgorithms() = default;
-    virtual const char* Name() const = 0;
-    virtual ResultInfo<ShortestPathResult<W>> ShortestPaths(const IGraph<W>& graph, int start) const = 0;
-    virtual ResultInfo<SccResult> StrongComponents(const IGraph<W>& graph) const = 0;
 };

@@ -3,8 +3,9 @@
 #include <chrono>
 #include <fstream>
 #include <string>
-#include "../algorithms/DijkstraAlgorithms.h"
-#include "../graph/GraphGenerator.h"
+#include "algorithms/ArrayDijkstra.h"
+#include "algorithms/HeapDijkstra.h"
+#include "graph/GraphGenerator.h"
 
 // одна строка таблицы замеров
 struct BenchRow {
@@ -20,12 +21,12 @@ template <EdgeWeight W>
 class Benchmark {
 public:
     // время одного алгоритма в миллисекундах, берём лучшее из repeats запусков
-    static ResultInfo<double> MeasureTime(const IGraphAlgorithms<W>& alg, const IGraph<W>& graph,
+    static ResultInfo<double> MeasureTime(const IShortestPath<W>& alg, const IGraph<W>& graph,
                                           int start, int repeats = 3) {
         double best = -1;
         for (int r = 0; r < repeats; ++r) {
             auto t1 = std::chrono::high_resolution_clock::now();
-            ResultInfo<ShortestPathResult<W>> res = alg.ShortestPaths(graph, start);
+            ResultInfo<ShortestPathResult<W>> res = alg.Run(graph, StartVertex{start});
             auto t2 = std::chrono::high_resolution_clock::now();
             if (res.IsFailure()) return ResultInfo<double>::Failure(res.GetError());
             double ms = std::chrono::duration<double, std::milli>(t2 - t1).count();
@@ -38,8 +39,8 @@ public:
     static ResultInfo<DynamicArray<BenchRow>> Run(const DynamicArray<int>& sizes, int perVertex,
                                                   unsigned seed, W maxWeight) {
         using R = ResultInfo<DynamicArray<BenchRow>>;
-        HeapGraphAlgorithms<W> heap;
-        ArrayGraphAlgorithms<W> arr;
+        HeapDijkstra<W> heap;
+        ArrayDijkstra<W> arr;
         DynamicArray<BenchRow> rows;
         EdgeOrder orders[3] = {EdgeOrder::Ascending, EdgeOrder::Descending, EdgeOrder::Random};
         const char* names[3] = {"ascending", "descending", "random"};

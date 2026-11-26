@@ -1,5 +1,6 @@
 #include "TestUtils.h"
-#include "algorithms/DijkstraAlgorithms.h"
+#include "algorithms/ArrayDijkstra.h"
+#include "algorithms/HeapDijkstra.h"
 #include "graph/GraphGenerator.h"
 
 namespace {
@@ -14,9 +15,9 @@ namespace {
         return g; // вершина 4 недостижима
     }
 
-    void CheckSample(const IGraphAlgorithms<int>& alg) {
+    void CheckSample(const IShortestPath<int>& alg) {
         Graph<int> g = Sample();
-        ResultInfo<ShortestPathResult<int>> r = alg.ShortestPaths(g, 0);
+        ResultInfo<ShortestPathResult<int>> r = alg.Run(g, StartVertex{0});
         CHECK_OK(r);
         const ShortestPathResult<int>& sp = r.GetValue();
         CHECK(sp.dist[0] == 0 && sp.dist[1] == 3 && sp.dist[2] == 1 && sp.dist[3] == 4);
@@ -31,23 +32,51 @@ namespace {
         CHECK_FAIL(sp.PathTo(4));
         CHECK_FAIL(sp.PathTo(-1));
 
-        CHECK_FAIL(alg.ShortestPaths(g, -1));
-        CHECK_FAIL(alg.ShortestPaths(g, 5));
+        CHECK_FAIL(alg.Run(g, StartVertex{-1}));
+        CHECK_FAIL(alg.Run(g, StartVertex{5}));
     }
 
-    void CheckNegative(const IGraphAlgorithms<int>& alg) {
+    void CheckNegative(const IShortestPath<int>& alg) {
         Graph<int> g(3);
         CHECK_OK(g.AddEdge(0, 1, 2));   // граф отрицательный вес принимает
         CHECK_OK(g.AddEdge(1, 2, -4));
-        ResultInfo<ShortestPathResult<int>> r = alg.ShortestPaths(g, 0);
-        CHECK_FAIL(r);                  // а Дейкстра нет
+        CHECK_FAIL(alg.Run(g, StartVertex{0})); // а Дейкстра нет
     }
+
+// новый алгоритм без правок существующих файлов: число вершин, достижимых из старта
+    class ReachableCount final : public IGraphAlgorithm<int, StartVertex, int> {
+    public:
+        const char* Name() const override { return "Reachable count"; }
+        ResultInfo<int> Run(const IGraph<int>& graph, const StartVertex& in) const override {
+            ResultInfo<bool> check = detail::CheckStart(graph, in.vertex);
+            if (check.IsFailure()) return ResultInfo<int>::Failure(check.GetError());
+            DynamicArray<bool> seen(graph.GetVerticesCount(), false);
+            DynamicArray<int> stack;
+            stack.PushBack(in.vertex);
+            seen[in.vertex] = true;
+            int count = 0;
+            while (!stack.IsEmpty()) {
+                int u = stack.PopBack().GetValue();
+                ++count;
+                ResultInfo<EdgeList<int>> nb = graph.GetNeighbors(u);
+                if (nb.IsFailure()) return ResultInfo<int>::Failure(nb.GetError());
+                for (size_t i = 0; i < nb.GetValue().GetSize(); ++i) {
+                    int to = nb.GetValue()[i]->To();
+                    if (!seen[to]) {
+                        seen[to] = true;
+                        stack.PushBack(to);
+                    }
+                }
+            }
+            return ResultInfo<int>::Success(count);
+        }
+    };
 
 } // namespace
 
 void RunDijkstraTests() {
-    HeapGraphAlgorithms<int> heap;
-    ArrayGraphAlgorithms<int> arr;
+    HeapDijkstra<int> heap;
+    ArrayDijkstra<int> arr;
 
     CheckSample(heap);
     CheckSample(arr);
@@ -55,15 +84,15 @@ void RunDijkstraTests() {
     CheckNegative(arr);
 
     // работа через указатель на интерфейс
-    const IGraphAlgorithms<int>* iface = &heap;
+    const IShortestPath<int>* iface = &heap;
     CHECK(iface->Name() != nullptr);
 
     // обе реализации дают одинаковые расстояния на случайных графах
     for (unsigned seed = 1; seed <= 5; ++seed) {
         Graph<int> g(200);
         CHECK_OK(GraphGenerator<int>::MakeRandom(g, 800, seed, 1, 50));
-        ResultInfo<ShortestPathResult<int>> a = heap.ShortestPaths(g, 0);
-        ResultInfo<ShortestPathResult<int>> b = arr.ShortestPaths(g, 0);
+        ResultInfo<ShortestPathResult<int>> a = heap.Run(g, StartVertex{0});
+        ResultInfo<ShortestPathResult<int>> b = arr.Run(g, StartVertex{0});
         CHECK(a.IsSuccess() && b.IsSuccess());
         bool same = true;
         for (int v = 0; v < 200; ++v) {
@@ -75,27 +104,33 @@ void RunDijkstraTests() {
     // цепь
     Graph<int> chain(100);
     GraphGenerator<int>::MakeChain(chain, 2);
-    CHECK(heap.ShortestPaths(chain, 0).GetValue().dist[99] == 198);
+    CHECK(heap.Run(chain, StartVertex{0}).GetValue().dist[99] == 198);
 
     // вес ноль
     Graph<int> zero(3);
     zero.AddEdge(0, 1, 0);
     zero.AddEdge(1, 2, 0);
-    CHECK(heap.ShortestPaths(zero, 0).GetValue().dist[2] == 0);
+    CHECK(heap.Run(zero, StartVertex{0}).GetValue().dist[2] == 0);
 
     // граф из одной вершины
     Graph<int> single(1);
-    CHECK(heap.ShortestPaths(single, 0).GetValue().dist[0] == 0);
+    CHECK(heap.Run(single, StartVertex{0}).GetValue().dist[0] == 0);
 
     // double и long long
     Graph<double> gd(3);
     gd.AddEdge(0, 1, 0.5);
     gd.AddEdge(1, 2, 0.25);
-    HeapGraphAlgorithms<double> heapD;
-    CHECK(heapD.ShortestPaths(gd, 0).GetValue().dist[2] == 0.75);
+    HeapDijkstra<double> heapD;
+    CHECK(heapD.Run(gd, StartVertex{0}).GetValue().dist[2] == 0.75);
     Graph<long long> gl(3);
     gl.AddEdge(0, 1, 3000000000LL);
     gl.AddEdge(1, 2, 3000000000LL);
-    ArrayGraphAlgorithms<long long> arrL;
-    CHECK(arrL.ShortestPaths(gl, 0).GetValue().dist[2] == 6000000000LL);
+    ArrayDijkstra<long long> arrL;
+    CHECK(arrL.Run(gl, StartVertex{0}).GetValue().dist[2] == 6000000000LL);
+
+    // расширяемость: свой алгоритм с другим типом результата работает с тем же графом
+    ReachableCount reach;
+    Graph<int> s = Sample();
+    CHECK(reach.Run(s, StartVertex{0}).GetValue() == 4); // вершина 4 недостижима
+    CHECK_FAIL(reach.Run(s, StartVertex{9}));
 }

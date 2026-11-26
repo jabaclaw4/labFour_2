@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../algorithms/IGraphAlgorithms.h"
+#include "algorithms/AlgorithmTypes.h"
 
 // вспомогательные части для алгоритмов кратчайших путей
 namespace detail {

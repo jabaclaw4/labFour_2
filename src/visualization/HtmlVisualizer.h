@@ -3,7 +3,7 @@
 #include <cmath>
 #include <fstream>
 #include <string>
-#include "../algorithms/IGraphAlgorithms.h"
+#include "algorithms/AlgorithmTypes.h"
 
 // статическая html-картинка графа (дополнение к окну GUI)
 template <EdgeWeight W>

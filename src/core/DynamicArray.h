@@ -5,7 +5,6 @@
 #include "ResultInfo.h"
 
 // динамический массив с удвоением вместимости
-// operator[] не проверяет границы (как у std::vector), безопасные версии: At и PopBack возвращают ResultInfo
 // для хранения типа нужен конструктор по умолчанию
 template <typename T>
 class DynamicArray {

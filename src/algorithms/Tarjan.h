@@ -1,15 +1,14 @@
 #pragma once
 
 #include <utility>
-#include "../algorithms/IGraphAlgorithms.h"
+#include "algorithms/IGraphAlgorithm.h"
 
-// общая часть всех реализаций: компоненты сильной связности (Тарьян, без рекурсии, O(V + E))
-// компоненты не зависят от весов, поэтому работают и с отрицательными
-// кратчайшие пути остаются на совести наследников
+// компоненты сильной связности: Тарьян, обход в глубину без рекурсии, O(V + E)
+// веса не используются, поэтому работает и с отрицательными
 template <EdgeWeight W>
-class GraphAlgorithmsBase : public IGraphAlgorithms<W> {
+class Tarjan final : public IComponents<W> {
 private:
-    // кадр итеративного обхода в глубину, соседи запрашиваются один раз
+    // кадр итеративного обхода, соседи запрашиваются один раз
     struct Frame {
         int v;
         size_t next;
@@ -19,7 +18,9 @@ private:
     };
 
 public:
-    ResultInfo<SccResult> StrongComponents(const IGraph<W>& graph) const override {
+    const char* Name() const override { return "Tarjan SCC"; }
+
+    ResultInfo<SccResult> Run(const IGraph<W>& graph, const NoInput&) const override {
         using R = ResultInfo<SccResult>;
         int n = graph.GetVerticesCount();
         SccResult result;
@@ -64,7 +65,6 @@ public:
                         lowlink[v] = index[w];
                     }
                 } else {
-                    // все соседи обработаны
                     if (lowlink[v] == index[v]) {
                         int w;
                         do {

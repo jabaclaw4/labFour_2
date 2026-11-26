@@ -15,7 +15,9 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
-#include "algorithms/DijkstraAlgorithms.h"
+#include "algorithms/ArrayDijkstra.h"
+#include "algorithms/HeapDijkstra.h"
+#include "algorithms/Tarjan.h"
 #include "graph/GraphGenerator.h"
 #include "visualization/HtmlVisualizer.h"
 
@@ -250,13 +252,14 @@ namespace {
                    x0, 292, 320, 330, ID_STATUS);
     }
 
-    void RunShortestPaths(const IGraphAlgorithms<int>& alg) {
+// любой алгоритм кратчайших путей: окно знает только интерфейс
+    void RunShortestPaths(const IShortestPath<int>& alg) {
         int start, target = -1;
         if (!ReadInt(ID_START, start)) { SetStatus(L"Введите стартовую вершину"); return; }
         bool hasTarget = ReadInt(ID_TARGET, target);
 
         ResetResults();
-        ResultInfo<ShortestPathResult<int>> r = alg.ShortestPaths(g_app.graph, start);
+        ResultInfo<ShortestPathResult<int>> r = alg.Run(g_app.graph, StartVertex{start});
         if (r.IsFailure()) {
             SetStatus(L"Ошибка: " + Widen(r.GetError()));
             Redraw();
@@ -288,9 +291,9 @@ namespace {
     }
 
     void RunComponents() {
-        HeapGraphAlgorithms<int> alg; // Тарьян лежит в базовом классе, подойдёт любая реализация
+        Tarjan<int> alg;
         ResetResults();
-        ResultInfo<SccResult> r = alg.StrongComponents(g_app.graph);
+        ResultInfo<SccResult> r = alg.Run(g_app.graph, NoInput{});
         if (r.IsFailure()) { SetStatus(L"Ошибка: " + Widen(r.GetError())); Redraw(); return; }
         g_app.scc = r.GetValue();
         g_app.hasScc = true;
@@ -357,8 +360,8 @@ namespace {
                 Redraw();
                 break;
             }
-            case ID_HEAP: { HeapGraphAlgorithms<int> a; RunShortestPaths(a); break; }
-            case ID_ARRAY: { ArrayGraphAlgorithms<int> a; RunShortestPaths(a); break; }
+            case ID_HEAP: { HeapDijkstra<int> a; RunShortestPaths(a); break; }
+            case ID_ARRAY: { ArrayDijkstra<int> a; RunShortestPaths(a); break; }
             case ID_SCC: RunComponents(); break;
             case ID_HTML: {
                 ResultInfo<bool> r = HtmlVisualizer<int>::Generate(

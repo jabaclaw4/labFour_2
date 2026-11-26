@@ -4,13 +4,12 @@
 #include <utility>
 
 // монада для обработки ошибок без исключений
-// Map / FlatMap / Filter / Recover принимают любые вызываемые объекты, в том числе лямбды с захватом
 template <class T>
 class ResultInfo {
 private:
     bool isSuccess;
-    T value;
-    const char* errorMessage;
+    T value;// результат успеха
+    const char* errorMessage;// сообщение ошибки
 
     ResultInfo(bool success, T val, const char* error)
             : isSuccess(success), value(std::move(val)), errorMessage(error) {}

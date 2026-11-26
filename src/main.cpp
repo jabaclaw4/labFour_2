@@ -8,7 +8,9 @@
 #endif
 #include <windows.h>
 #endif
-#include "algorithms/DijkstraAlgorithms.h"
+#include "algorithms/ArrayDijkstra.h"
+#include "algorithms/HeapDijkstra.h"
+#include "algorithms/Tarjan.h"
 #include "benchmark/Benchmark.h"
 #include "core/Common.h"
 #include "graph/Graph.h"
@@ -148,9 +150,9 @@ namespace {
         int start, target;
         if (!ReadInt("стартовая вершина: ", 0, n - 1, start)) return;
 
-        HeapGraphAlgorithms<int> heap;
-        ArrayGraphAlgorithms<int> arr;
-        ResultInfo<ShortestPathResult<int>> r = heap.ShortestPaths(g, start);
+        HeapDijkstra<int> heap;
+        ArrayDijkstra<int> arr;
+        ResultInfo<ShortestPathResult<int>> r = heap.Run(g, StartVertex{start});
         if (r.IsFailure()) {
             std::cout << "ошибка: " << r.GetError() << "\n";
             return;
@@ -182,8 +184,8 @@ namespace {
 
     void RunComponents(const Graph<int>& g) {
         if (!HasGraph(g)) return;
-        HeapGraphAlgorithms<int> alg;
-        ResultInfo<SccResult> r = alg.StrongComponents(g);
+        Tarjan<int> alg;
+        ResultInfo<SccResult> r = alg.Run(g, NoInput{});
         if (r.IsFailure()) {
             std::cout << "ошибка: " << r.GetError() << "\n";
             return;
@@ -218,8 +220,8 @@ namespace {
         }
         const LazyGraph<int>& lg = created.GetValue();
 
-        HeapGraphAlgorithms<int> alg;
-        ResultInfo<ShortestPathResult<int>> r = alg.ShortestPaths(lg, 0);
+        HeapDijkstra<int> alg;
+        ResultInfo<ShortestPathResult<int>> r = alg.Run(lg, StartVertex{0});
         if (r.IsFailure()) {
             std::cout << "ошибка: " << r.GetError() << "\n";
             return;
